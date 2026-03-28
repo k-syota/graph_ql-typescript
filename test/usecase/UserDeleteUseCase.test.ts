@@ -1,5 +1,5 @@
-import { UserDeleteUseCase } from "../UserDeleteUseCase";
-import { UserRepository } from "../../domain/repositories/UserRepository";
+import { UserDeleteUseCase } from "../../src/usecase/UserDeleteUseCase";
+import { UserRepository } from "../../src/domain/repositories/UserRepository";
 
 describe("UserDeleteUseCase", () => {
   const mockRepository: jest.Mocked<UserRepository> = {

@@ -1,6 +1,6 @@
-import { UserCreateUseCase } from "../UserCreateUseCase";
-import { UserRepository } from "../../domain/repositories/UserRepository";
-import { User } from "../../domain/entities/User";
+import { UserCreateUseCase } from "../../src/usecase/UserCreateUseCase";
+import { UserRepository } from "../../src/domain/repositories/UserRepository";
+import { User } from "../../src/domain/entities/User";
 
 describe("UserCreateUseCase", () => {
   const now = new Date("2025-01-01T00:00:00Z");

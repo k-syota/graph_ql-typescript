@@ -1,8 +1,8 @@
-import { UserGateway } from "../gateways/UserGateway";
-import { AppDataSource } from "../database/data-source";
-import { UserEntity } from "../entities/UserEntity";
+import { UserGateway } from "../../src/infrastructure/gateways/UserGateway";
+import { AppDataSource } from "../../src/infrastructure/database/data-source";
+import { UserEntity } from "../../src/infrastructure/entities/UserEntity";
 
-jest.mock("../database/data-source", () => ({
+jest.mock("../../src/infrastructure/database/data-source", () => ({
   AppDataSource: {
     getRepository: jest.fn(),
   },

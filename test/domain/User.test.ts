@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { User } from "../../src/domain/entities/User";
 
 describe("User", () => {
   const now = new Date("2025-01-01T00:00:00Z");

@@ -1,6 +1,6 @@
-import { createUserResolvers } from "../graphql/resolvers/userResolvers";
-import { UserRepository } from "../../domain/repositories/UserRepository";
-import { User } from "../../domain/entities/User";
+import { createUserResolvers } from "../../src/presentation/graphql/resolvers/userResolvers";
+import { UserRepository } from "../../src/domain/repositories/UserRepository";
+import { User } from "../../src/domain/entities/User";
 
 describe("userResolvers", () => {
   const now = new Date("2025-01-01T00:00:00Z");
