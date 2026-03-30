@@ -5,39 +5,24 @@
 | 項目 | 値 |
 |------|-----|
 | URL | `http://localhost:4001` (Docker環境) / `http://localhost:4000` (ローカル) |
-| プロトコル | HTTP |
 | メソッド | `POST` |
 | Content-Type | `application/json` |
-| GraphQL Playground | ブラウザで上記URLにアクセスするとApollo Sandboxが利用可能 |
+| Playground | ブラウザで上記URLにアクセス → Apollo Sandbox |
 
 > Apollo ServerはすべてのGraphQLリクエストを単一のエンドポイント（`POST /`）で受け付けます。
 
-## リクエスト形式
+## Postmanでの使い方
 
-すべてのリクエストは以下のJSON形式で送信します:
-
-```json
-{
-  "query": "GraphQLクエリ文字列",
-  "variables": { "変数名": "値" }
-}
-```
-
-### curlでのリクエスト例
-
-```bash
-curl -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ users { id name email } }"}'
-```
+1. リクエストタイプを **POST** に設定
+2. URLに `http://localhost:4001` を入力
+3. **Body** タブ → **GraphQL** を選択
+4. **QUERY** 欄にGraphQLクエリを、**GRAPHQL VARIABLES** 欄にJSON変数を入力
 
 ---
 
 ## スキーマ定義
 
-### 型定義
-
-#### User
+### User
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
@@ -47,20 +32,20 @@ curl -X POST http://localhost:4001 \
 | `createdAt` | `String!` | 作成日時（ISO 8601形式） |
 | `updatedAt` | `String!` | 更新日時（ISO 8601形式） |
 
-#### DeleteResult
+### DeleteResult
 
 | フィールド | 型 | 説明 |
 |-----------|------|------|
 | `success` | `Boolean!` | 削除が成功したかどうか |
 
-#### CreateUserInput
+### CreateUserInput
 
 | フィールド | 型 | 必須 | 説明 |
 |-----------|------|------|------|
 | `name` | `String!` | Yes | ユーザー名 |
 | `email` | `String!` | Yes | メールアドレス |
 
-#### UpdateUserInput
+### UpdateUserInput
 
 | フィールド | 型 | 必須 | 説明 |
 |-----------|------|------|------|
@@ -71,12 +56,14 @@ curl -X POST http://localhost:4001 \
 
 ## Query
 
-### `users` - 全ユーザー取得
+### 1. 全ユーザー取得
 
 全ユーザーをID昇順で返します。
 
+**QUERY:**
+
 ```graphql
-query {
+query GetUsers {
   users {
     id
     name
@@ -86,6 +73,8 @@ query {
   }
 }
 ```
+
+**GRAPHQL VARIABLES:** なし
 
 **レスポンス例:**
 
@@ -112,13 +101,15 @@ query {
 }
 ```
 
-### `user(id)` - ユーザーをID指定で取得
+### 2. ユーザーをID指定で取得
 
 指定したIDのユーザーを返します。存在しない場合は `null` を返します。
 
+**QUERY:**
+
 ```graphql
-query {
-  user(id: 1) {
+query GetUser($id: Int!) {
+  user(id: $id) {
     id
     name
     email
@@ -128,11 +119,13 @@ query {
 }
 ```
 
-**引数:**
+**GRAPHQL VARIABLES:**
 
-| 名前 | 型 | 必須 | 説明 |
-|------|------|------|------|
-| `id` | `Int!` | Yes | ユーザーID |
+```json
+{
+  "id": 1
+}
+```
 
 **レスポンス例:**
 
@@ -150,7 +143,7 @@ query {
 }
 ```
 
-**存在しない場合:**
+**存在しないIDの場合:**
 
 ```json
 {
@@ -164,13 +157,15 @@ query {
 
 ## Mutation
 
-### `createUser(input)` - ユーザー作成
+### 3. ユーザー作成
 
 新しいユーザーを作成します。
 
+**QUERY:**
+
 ```graphql
-mutation {
-  createUser(input: { name: "田中太郎", email: "tanaka@example.com" }) {
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
     id
     name
     email
@@ -180,17 +175,7 @@ mutation {
 }
 ```
 
-**変数を使用する場合:**
-
-```graphql
-mutation CreateUser($input: CreateUserInput!) {
-  createUser(input: $input) {
-    id
-    name
-    email
-  }
-}
-```
+**GRAPHQL VARIABLES:**
 
 ```json
 {
@@ -217,13 +202,15 @@ mutation CreateUser($input: CreateUserInput!) {
 }
 ```
 
-### `updateUser(id, input)` - ユーザー更新
+### 4. ユーザー更新
 
 指定したIDのユーザー情報を更新します。`input` 内のフィールドは任意で、指定したフィールドのみ更新されます。
 
+**QUERY:**
+
 ```graphql
-mutation {
-  updateUser(id: 1, input: { name: "田中次郎" }) {
+mutation UpdateUser($id: Int!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
     id
     name
     email
@@ -232,12 +219,39 @@ mutation {
 }
 ```
 
-**引数:**
+**GRAPHQL VARIABLES（名前のみ更新）:**
 
-| 名前 | 型 | 必須 | 説明 |
-|------|------|------|------|
-| `id` | `Int!` | Yes | 更新対象のユーザーID |
-| `input` | `UpdateUserInput!` | Yes | 更新内容 |
+```json
+{
+  "id": 1,
+  "input": {
+    "name": "田中次郎"
+  }
+}
+```
+
+**GRAPHQL VARIABLES（メールのみ更新）:**
+
+```json
+{
+  "id": 1,
+  "input": {
+    "email": "jiro@example.com"
+  }
+}
+```
+
+**GRAPHQL VARIABLES（名前とメール両方更新）:**
+
+```json
+{
+  "id": 1,
+  "input": {
+    "name": "田中次郎",
+    "email": "jiro@example.com"
+  }
+}
+```
 
 **レスポンス例:**
 
@@ -247,32 +261,36 @@ mutation {
     "updateUser": {
       "id": 1,
       "name": "田中次郎",
-      "email": "tanaka@example.com",
+      "email": "jiro@example.com",
       "updatedAt": "2026-03-30T12:00:00.000Z"
     }
   }
 }
 ```
 
-### `deleteUser(id)` - ユーザー削除
+### 5. ユーザー削除
 
 指定したIDのユーザーを削除します。
 
+**QUERY:**
+
 ```graphql
-mutation {
-  deleteUser(id: 1) {
+mutation DeleteUser($id: Int!) {
+  deleteUser(id: $id) {
     success
   }
 }
 ```
 
-**引数:**
+**GRAPHQL VARIABLES:**
 
-| 名前 | 型 | 必須 | 説明 |
-|------|------|------|------|
-| `id` | `Int!` | Yes | 削除対象のユーザーID |
+```json
+{
+  "id": 1
+}
+```
 
-**レスポンス例:**
+**レスポンス例（成功）:**
 
 ```json
 {
@@ -284,7 +302,17 @@ mutation {
 }
 ```
 
-> 存在しないIDを指定した場合、`success` は `false` を返します。
+**レスポンス例（存在しないID）:**
+
+```json
+{
+  "data": {
+    "deleteUser": {
+      "success": false
+    }
+  }
+}
+```
 
 ---
 
@@ -317,44 +345,16 @@ GraphQLのエラーは以下の形式で返されます:
 
 ---
 
-## curlリクエスト集
+## 動作確認の手順
 
-### 全ユーザー取得
+Postmanで以下の順に実行すると、CRUD操作を一通り確認できます。
 
-```bash
-curl -s -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ users { id name email createdAt updatedAt } }"}' | jq
-```
-
-### ID指定取得
-
-```bash
-curl -s -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "{ user(id: 1) { id name email } }"}' | jq
-```
-
-### ユーザー作成
-
-```bash
-curl -s -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "mutation { createUser(input: { name: \"田中太郎\", email: \"tanaka@example.com\" }) { id name email } }"}' | jq
-```
-
-### ユーザー更新
-
-```bash
-curl -s -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "mutation { updateUser(id: 1, input: { name: \"田中次郎\" }) { id name email } }"}' | jq
-```
-
-### ユーザー削除
-
-```bash
-curl -s -X POST http://localhost:4001 \
-  -H "Content-Type: application/json" \
-  -d '{"query": "mutation { deleteUser(id: 1) { success } }"}' | jq
-```
+| 手順 | 操作 | 確認ポイント |
+|------|------|------------|
+| 1 | [全ユーザー取得](#1-全ユーザー取得) | 初期状態では空配列 `[]` が返る |
+| 2 | [ユーザー作成](#3-ユーザー作成) | `id: 1` で作成される |
+| 3 | [ID指定取得](#2-ユーザーをid指定で取得) | 作成したユーザーが取得できる |
+| 4 | [ユーザー更新](#4-ユーザー更新) | `name` が変更されている |
+| 5 | [全ユーザー取得](#1-全ユーザー取得) | 更新後の内容が反映されている |
+| 6 | [ユーザー削除](#5-ユーザー削除) | `success: true` が返る |
+| 7 | [全ユーザー取得](#1-全ユーザー取得) | 空配列 `[]` に戻る |
